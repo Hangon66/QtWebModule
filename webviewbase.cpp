@@ -112,6 +112,11 @@ void WebViewBase::setDefaultFilePath(const QString &path)
     }
 }
 
+bool WebViewBase::isLoading() const
+{
+    return m_isLoading;
+}
+
 /**
  * @brief 同步独立窗口的位置和大小到占位控件的全局坐标。
  *
@@ -164,8 +169,14 @@ void WebViewBase::syncWebWindow()
 
 void WebViewBase::initConnections()
 {
-    // 转发 QWebEnginePage 的 loadFinished 信号
-    connect(m_page, &QWebEnginePage::loadFinished, this, &WebViewBase::loadFinished);
+    // 跟踪加载状态
+    connect(m_page, &QWebEnginePage::loadStarted, this, [this]() {
+        m_isLoading = true;
+    });
+    connect(m_page, &QWebEnginePage::loadFinished, this, [this](bool ok) {
+        m_isLoading = false;
+        emit loadFinished(ok);
+    });
 }
 
 void WebViewBase::showEvent(QShowEvent *event)

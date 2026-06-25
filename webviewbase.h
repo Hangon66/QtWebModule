@@ -39,6 +39,12 @@ public:
      */
     void setDefaultFilePath(const QString &path);
 
+    /**
+     * @brief 检查当前页面是否正在加载。
+     * @return true 表示正在加载，false 表示加载已完成或未开始加载。
+     */
+    bool isLoading() const;
+
 signals:
     /**
      * @brief 页面加载完成时发出。
@@ -75,5 +81,6 @@ private:
      * @brief 位置同步定时器，跟踪父窗口移动（moveEvent 无法捕获父窗口移动）。
      */
     QTimer *m_syncTimer = nullptr;
+    bool m_isLoading = false; ///< 页面加载状态标记
 };
 #endif // WEBVIEWBASE_H
