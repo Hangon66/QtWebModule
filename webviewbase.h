@@ -39,6 +39,13 @@ public:
      */
     void setDefaultFilePath(const QString &path);
 
+signals:
+    /**
+     * @brief 页面加载完成时发出。
+     * @param ok 加载是否成功。
+     */
+    void loadFinished(bool ok);
+
 protected:
     void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
@@ -50,6 +57,7 @@ private:
      * @brief 同步独立窗口的位置和大小到占位控件的全局坐标。
      */
     void syncWebWindow();
+    void initConnections();
 
     Ui::WebViewBase *ui;
     QWebEngineView *m_webView = nullptr; // 成员变量存储 Web 视图

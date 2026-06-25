@@ -55,6 +55,8 @@ WebViewBase::WebViewBase(QWidget *parent)
     m_syncTimer->setInterval(50); // 50ms = 20fps，跟踪流畅且开销极小
     connect(m_syncTimer, &QTimer::timeout, this, &WebViewBase::syncWebWindow);
     m_syncTimer->start();
+
+    initConnections();
 }
 
 WebViewBase::~WebViewBase()
@@ -158,6 +160,12 @@ void WebViewBase::syncWebWindow()
             m_webWindow->hide();
         }
     }
+}
+
+void WebViewBase::initConnections()
+{
+    // 转发 QWebEnginePage 的 loadFinished 信号
+    connect(m_page, &QWebEnginePage::loadFinished, this, &WebViewBase::loadFinished);
 }
 
 void WebViewBase::showEvent(QShowEvent *event)
