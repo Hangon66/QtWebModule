@@ -5,6 +5,8 @@
 #include <QWebEngineView>
 #include <QWebEnginePage>
 #include <QTimer>
+#include <functional>
+#include <QVariant>
 #include "webpagebase.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,6 +24,14 @@ public:
     WebViewBase(QWidget *parent = nullptr);
     ~WebViewBase();
     void loadUrl(const QUrl &url);
+
+    /**
+     * @brief 在当前页面中执行 JavaScript 代码。
+     * @param scriptSource 要执行的 JavaScript 源代码。
+     * @param callback 可选回调，接收脚本执行结果（QVariant）。
+     */
+    void runJavaScript(const QString &scriptSource,
+                       const std::function<void(const QVariant &)> &callback = {});
 
     /**
      * @brief 设置 WebView 内 HTML 文件选择对话框的默认路径。

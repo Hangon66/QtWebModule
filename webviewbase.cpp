@@ -95,6 +95,14 @@ void WebViewBase::loadUrl(const QUrl &url)
     m_webView->load(url);
 }
 
+void WebViewBase::runJavaScript(const QString &scriptSource,
+                                const std::function<void(const QVariant &)> &callback)
+{
+    if (m_page) {
+        m_page->runJavaScript(scriptSource, callback);
+    }
+}
+
 void WebViewBase::setDefaultFilePath(const QString &path)
 {
     if (m_page) {
