@@ -1,5 +1,6 @@
 #include "webpagebase.h"
 #include <QFileDialog>
+#include <QDebug>
 
 WebPageBase::WebPageBase(QObject *parent)
     : QWebEnginePage{parent}
@@ -10,6 +11,16 @@ WebPageBase::WebPageBase(QObject *parent)
 void WebPageBase::setDefaultFilePath(const QString &path)
 {
     m_defaultFilePath = path;
+}
+
+void WebPageBase::setJavaScriptConsoleLoggingEnabled(bool enabled)
+{
+    m_jsConsoleLogging = enabled;
+}
+
+bool WebPageBase::isJavaScriptConsoleLoggingEnabled() const
+{
+    return m_jsConsoleLogging;
 }
 
 /**
@@ -63,4 +74,23 @@ QStringList WebPageBase::chooseFiles(FileSelectionMode mode,
     if (file.isEmpty())
         return QStringList();
     return QStringList(file);
+}
+
+void WebPageBase::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level,
+                                            const QString &message,
+                                            int lineNumber,
+                                            const QString &sourceID)
+{
+    if (!m_jsConsoleLogging)
+        return;
+
+    const char *levelStr = "";
+    switch (level) {
+    case InfoMessageLevel:    levelStr = "INFO"; break;
+    case WarningMessageLevel: levelStr = "WARN"; break;
+    case ErrorMessageLevel:   levelStr = "ERROR"; break;
+    default:                  levelStr = "LOG"; break;
+    }
+    qDebug().noquote() << QString("[JS %1] %2 (line %3, %4)")
+                              .arg(levelStr).arg(message).arg(lineNumber).arg(sourceID);
 }

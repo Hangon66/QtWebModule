@@ -40,6 +40,12 @@ public:
     void setDefaultFilePath(const QString &path);
 
     /**
+     * @brief 设置是否将 JS 控制台输出转发到 qDebug。
+     * @param enabled true 启用，false 禁用。默认禁用。
+     */
+    void setJavaScriptConsoleLoggingEnabled(bool enabled);
+
+    /**
      * @brief 检查当前页面是否正在加载。
      * @return true 表示正在加载，false 表示加载已完成或未开始加载。
      */

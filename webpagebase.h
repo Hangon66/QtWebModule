@@ -20,8 +20,27 @@ public:
      */
     void setDefaultFilePath(const QString &path);
 
+    /**
+     * @brief 设置是否将 JS 控制台输出转发到 qDebug。
+     * @param enabled true 启用日志转发，false 禁用。默认禁用。
+     */
+    void setJavaScriptConsoleLoggingEnabled(bool enabled);
+
+    /**
+     * @brief 查询 JS 控制台日志转发是否启用。
+     */
+    bool isJavaScriptConsoleLoggingEnabled() const;
+
 protected:
     QWebEnginePage* createWindow(QWebEnginePage::WebWindowType type) override;
+
+    /**
+     * @brief 捕获 JS 控制台输出，转发到 qDebug 方便调试。
+     */
+    void javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsoleMessageLevel level,
+                                  const QString &message,
+                                  int lineNumber,
+                                  const QString &sourceID) override;
 
     /**
      * @brief 重写文件选择逻辑，支持自定义默认目录。
@@ -45,6 +64,7 @@ private:
      * 由 setDefaultFilePath() 设置，为空时使用系统默认路径。
      */
     QString m_defaultFilePath;
+    bool m_jsConsoleLogging = false; ///< JS 控制台日志转发开关，默认关闭
 };
 
 #endif // WEBPAGEBASE_H

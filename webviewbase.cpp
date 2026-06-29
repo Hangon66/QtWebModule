@@ -112,6 +112,13 @@ void WebViewBase::setDefaultFilePath(const QString &path)
     }
 }
 
+void WebViewBase::setJavaScriptConsoleLoggingEnabled(bool enabled)
+{
+    if (m_page) {
+        m_page->setJavaScriptConsoleLoggingEnabled(enabled);
+    }
+}
+
 bool WebViewBase::isLoading() const
 {
     return m_isLoading;
