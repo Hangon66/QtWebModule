@@ -28,7 +28,8 @@ WebViewBase::WebViewBase(QWidget *parent)
     // 创建独立顶层窗口，承载 QWebEngineView
     // Qt::Window 使其成为独立顶层窗口，不参与主窗口的 widget 合成
     // Qt::FramelessWindowHint 去掉标题栏，视觉上与嵌入一致
-    m_webWindow = new QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint);
+    // Qt::Tool 防止在任务栏中显示独立按钮
+    m_webWindow = new QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
 
     m_webView = new QWebEngineView(m_webWindow);
 
@@ -43,6 +44,8 @@ WebViewBase::WebViewBase(QWidget *parent)
     settings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     settings->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
     settings->setAttribute(QWebEngineSettings::XSSAuditingEnabled, false);
+    settings->setAttribute(QWebEngineSettings::WebGLEnabled, false);
+    settings->setAttribute(QWebEngineSettings::Accelerated2dCanvasEnabled, false);
 
     QVBoxLayout *layout = new QVBoxLayout(m_webWindow);
     layout->setContentsMargins(0, 0, 0, 0);
