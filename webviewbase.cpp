@@ -9,6 +9,10 @@
 #include <QResizeEvent>
 #include <QMoveEvent>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 /**
  * @brief 构造 WebViewBase 占位控件，QWebEngineView 放入独立顶层窗口以避免 D3D11 合成冲突。
  *
@@ -28,8 +32,7 @@ WebViewBase::WebViewBase(QWidget *parent)
     // 创建独立顶层窗口，承载 QWebEngineView
     // Qt::Window 使其成为独立顶层窗口，不参与主窗口的 widget 合成
     // Qt::FramelessWindowHint 去掉标题栏，视觉上与嵌入一致
-    // Qt::Tool 防止在任务栏中显示独立按钮
-    m_webWindow = new QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
+    m_webWindow = new QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint);
 
     m_webView = new QWebEngineView(m_webWindow);
 
@@ -44,8 +47,10 @@ WebViewBase::WebViewBase(QWidget *parent)
     settings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     settings->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
     settings->setAttribute(QWebEngineSettings::XSSAuditingEnabled, false);
-    settings->setAttribute(QWebEngineSettings::WebGLEnabled, false);
-    settings->setAttribute(QWebEngineSettings::Accelerated2dCanvasEnabled, false);
+// 显式启用 GPU 加速相关设置，提升 Cesium 3D 渲染性能
+    settings->setAttribute(QWebEngineSettings::WebGLEnabled, true);
+    settings->setAttribute(QWebEngineSettings::Accelerated2dCanvasEnabled, true);
+    settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
 
     QVBoxLayout *layout = new QVBoxLayout(m_webWindow);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -166,9 +171,27 @@ void WebViewBase::syncWebWindow()
         if (!m_webWindow->isVisible()) {
             m_webWindow->show();
         }
-        // 确保独立窗口在主窗口之上（处理 z-order 变化）
+        // 仅在 Web 窗口被主窗口遮盖时才 raise，避免持续 raise 导致 HUD 闪烁
         if (topLevel && topLevel->isActiveWindow()) {
+#ifdef Q_OS_WIN
+            HWND webHwnd = reinterpret_cast<HWND>(m_webWindow->winId());
+            HWND mainHwnd = reinterpret_cast<HWND>(topLevel->winId());
+            // 遍历 z-order：如果主窗口在 web 窗口之上，说明被遮盖
+            bool covered = false;
+            HWND hwnd = webHwnd;
+            while (hwnd) {
+                hwnd = GetWindow(hwnd, GW_HWNDPREV);
+                if (hwnd == mainHwnd) {
+                    covered = true;
+                    break;
+                }
+            }
+            if (covered) {
+                m_webWindow->raise();
+            }
+#else
             m_webWindow->raise();
+#endif
         }
     } else {
         if (m_webWindow->isVisible()) {
