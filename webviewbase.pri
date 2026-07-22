@@ -1,6 +1,6 @@
 # WebViewBase 组件 —— 供其他项目通过 include(webviewbase.pri) 引用
 
-QT += core gui webenginewidgets
+QT += core gui webenginewidgets webchannel
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17
 

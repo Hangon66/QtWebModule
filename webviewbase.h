@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QWebEngineView>
 #include <QWebEnginePage>
+#include <QWebChannel>
 #include <QTimer>
 #include <functional>
 #include <QVariant>
@@ -38,6 +39,20 @@ public:
      * @param path 默认目录的绝对路径。
      */
     void setDefaultFilePath(const QString &path);
+
+    /**
+     * @brief 注册 C++ QObject 对象到 Web 端，供 JavaScript 调用。
+     * @param name JS 中访问该对象的名称。
+     * @param object 要注册的 QObject 指针，其 Q_INVOKABLE 方法和 slots 可被 JS 调用。
+     *
+     * Web 端 JS 使用方式：
+     * @code
+     * new QWebChannel(qt.webChannelTransport, function(channel) {
+     *     channel.objects.myObj.someMethod("arg");
+     * });
+     * @endcode
+     */
+    void registerObject(const QString &name, QObject *object);
 
     /**
      * @brief 设置是否将 JS 控制台输出转发到 qDebug。
@@ -88,5 +103,6 @@ private:
      */
     QTimer *m_syncTimer = nullptr;
     bool m_isLoading = false; ///< 页面加载状态标记
+    QWebChannel *m_webChannel = nullptr; ///< JS ↔ C++ 通信通道
 };
 #endif // WEBVIEWBASE_H

@@ -52,6 +52,10 @@ WebViewBase::WebViewBase(QWidget *parent)
     settings->setAttribute(QWebEngineSettings::Accelerated2dCanvasEnabled, true);
     settings->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
 
+    // 初始化 QWebChannel，支持 JS 调用 C++ 对象
+    m_webChannel = new QWebChannel(m_page);
+    m_page->setWebChannel(m_webChannel);
+
     QVBoxLayout *layout = new QVBoxLayout(m_webWindow);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -124,6 +128,13 @@ void WebViewBase::setJavaScriptConsoleLoggingEnabled(bool enabled)
 {
     if (m_page) {
         m_page->setJavaScriptConsoleLoggingEnabled(enabled);
+    }
+}
+
+void WebViewBase::registerObject(const QString &name, QObject *object)
+{
+    if (m_webChannel) {
+        m_webChannel->registerObject(name, object);
     }
 }
 
